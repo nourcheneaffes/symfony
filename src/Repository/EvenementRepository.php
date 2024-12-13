@@ -14,6 +14,17 @@ class EvenementRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Evenement::class);
+        
+    }
+    public function countParticipants(Evenement $evenement): int
+    {
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.participations', 'p')  // Assurez-vous que vous avez la bonne relation
+            ->andWhere('e.id = :id')
+            ->setParameter('id', $evenement->getId())
+            ->select('COUNT(p.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
 //    /**

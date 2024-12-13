@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
 class PagesController extends AbstractController
 {
@@ -26,11 +27,7 @@ class PagesController extends AbstractController
         return $this->render('pages/courses.html.twig');
     }
 
-    #[Route('/events', name: 'page_events')]
-    public function events(): Response
-    {
-        return $this->render('pages/events.html.twig');
-    }
+   
     
     #[Route('/blog', name: 'page_blog')]
     public function blog(): Response

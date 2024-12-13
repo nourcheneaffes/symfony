@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EVENT{% endblock %}
+
+{% block body %}
+
+<!-- page title -->
+<section class="page-title-section overlay" data-background="images/backgrounds/page-title.jpg">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <ul class="list-inline custom-breadcrumb">
+          <li class="list-inline-item"><a class="h2 text-primary font-secondary" href="#">Upcoming Events</a></li>
+          <li class="list-inline-item text-white h3 font-secondary"></li>
+        </ul>
+        <p class="text-lighten">join us and make every moment unforgettable!</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /page title -->
+
+<!-- Search and Events Table -->
+<section class="section">
+  <div class="container">
+    <!-- Search Input -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <input 
+          type="text" 
+          id="search-location" 
+          class="form-control" 
+          placeholder="Search by location..." 
+          onkeyup="filterEvents()">
+      </div>
+    </div>
+
+    <!-- Events List -->
+    <div class="row" id="events-list">
+      {% for evenement in evenementss %}
+        {% set participationCount = participationCounts | filter(p => p.evenementId == evenement.id) | first %}
+        {% set nbParticipants = participationCount.nbParticipants ?? 0 %}
+        {% set evenementCloture = (nbParticipants >= evenement.nbLimiteParticipants) %}
+
+        <div class="col-lg-4 col-sm-6 mb-5 event-item" data-location="{{ evenement.lieu | lower }}">
+          <div class="card border-0 rounded-0 hover-shadow">
+            <div class="card-img position-relative">
+              <div class="card-img-top position-relative" style="height: 250px; overflow: hidden;">
+                {% if evenement.imageevenement %}
+                  <img src="{{ asset('uploads/images/' ~ evenement.imageevenement) }}" 
+                       alt="Image de l'événement {{ evenement.titreEven }}" 
+                       class="img-fluid w-100" 
+                       style="object-fit: contain; height: 100%; width: 100%;">
+                {% else %}
+                  <div class="d-flex justify-content-center align-items-center bg-light" style="height: 100%; width: 100%;">
+                    <p class="text-muted mb-0">Image indisponible</p>
+                  </div>
+                {% endif %}
+              </div>
+              <div class="card-date">
+                <span>{{ evenement.dateEvenement ? evenement.dateEvenement|date('d') : '' }}</span>
+                <br>{{ evenement.dateEvenement ? evenement.dateEvenement|date('F') : '' }}
+              </div>
+            </div>
+            <div class="card-body">
+              <p>
+                <i class="ti-location-pin text-primary mr-2"></i>
+                {{ evenement.lieu }}
+              </p>
+              <a href="{{ evenementCloture ? '#' : path('app_evenement_show_student', {'id': evenement.id}) }}" 
+                 class="{{ evenementCloture ? 'disabled-link' : '' }}">
+                <h4 class="card-title">{{ evenement.titreEven }}</h4>
+              </a>
+              <!-- Event Price -->
+              <p class="text-primary font-weight-bold">Prix: {{ evenement.prixevenement ? evenement.prixevenement ~ '$' : 'Gratuit' }}</p>
+
+              {# État de l'événement #}
+              {% if evenementCloture %}
+                <p class="text-danger font-weight-bold">Cet événement est clôturé.</p>
+              {% else %}
+                <p class="text-success">Places disponibles : {{ evenement.nbLimiteParticipants - nbParticipants }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="col-12 text-center">
+          <p>No events found</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+  // JavaScript function to filter events by location
+  function filterEvents() {
+    const input = document.getElementById('search-location').value.toLowerCase();
+    const eventItems = document.querySelectorAll('.event-item');
+
+    eventItems.forEach(item => {
+      const location = item.getAttribute('data-location');
+      if (location.includes(input)) {
+        item.style.display = ''; // Show item
+      } else {
+        item.style.display = 'none'; // Hide item
+      }
+    });
+  }
+</script>
+
+{% endblock %}
